@@ -6,8 +6,10 @@ This server acts as a bridge between your coding agent (Claude, Gemini, Copilot,
 
 ## Features
 
-- **Standard Tools**: Direct support for Native Stitch functionalities (`create_project`, `generate_screen`, `edit_screen`, etc.)
+- **Standard Tools**: Direct support for Native Stitch functionalities (`create_project`, `generate_screen`, `edit_screen`, `list_projects`, `generate_variants`).
 - **Advanced Agent Macro Tools**: 
+  - `get_screen_code`: Fetches raw HTML for generated screens.
+  - `get_screen_image`: Fetches screenshot images associated with your screens.
   - `generate_and_fetch_code`: Create a UI and retrieve its HTML code in a single round-trip, saving extreme token latency and minimizing prompt complexity.
   - `scaffold_project_files`: Seamlessly save and map an abstract Stitch UI directly to local files in the active workspace.
 - **Context Resources**: Map abstract IDs natively with `stitch://projects` and `stitch://projects/{projectId}/screens` context providers.

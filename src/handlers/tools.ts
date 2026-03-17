@@ -160,6 +160,30 @@ export function registerTools(server: McpServer) {
   );
 
   server.tool(
+    "get_screen_image",
+    "Retrieve the base64 screenshot image download URL for a generated screen.",
+    {
+      projectId: z.string().describe("The ID of the project"),
+      screenId: z.string().describe("The ID of the screen"),
+    },
+    async ({ projectId, screenId }) => {
+      try {
+        const project = stitch.project(projectId);
+        const screen = await project.getScreen(screenId);
+        const imageUrl = await screen.getImage();
+
+        return {
+          content: [
+            { type: "text", text: `Screenshot fetched successfully! Image available at URL: ${imageUrl}` },
+          ],
+        };
+      } catch (error: any) {
+        return { content: [{ type: "text", text: `Error retrieving screen image: ${error?.message || String(error)}` }], isError: true };
+      }
+    }
+  );
+
+  server.tool(
     "generate_and_fetch_code",
     "One-step tool to generate a UI screen and immediately retrieve its HTML code",
     {
