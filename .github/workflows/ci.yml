@@ -28,6 +28,7 @@ jobs:
     - name: Build project
       run: npm run build
       
-    - name: Run Tests (placeholder)
+    - name: Run Tests
+      env:
+        STITCH_API_KEY: ${{ secrets.STITCH_API_KEY }}
       run: npm run test
-      # Optionally, if we add pure unit tests: run: npm run test
