@@ -39,4 +39,4 @@ coverage/
 
 # Misc
 .cache/
-.turbo/
+.turbo/tests/fixtures/

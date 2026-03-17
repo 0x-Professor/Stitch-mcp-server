@@ -4,16 +4,25 @@
   "description": "Enterprise-ready MCP Server for Google Stitch UI generation SDK",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --experimental-vm-modules node_modules/vitest/vitest.mjs run",
     "build": "tsup",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepare": "npm run build"
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
     "stitch",
     "ai",
     "google-stitch"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0x-Professor/Stitch-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/0x-Professor/Stitch-mcp-server/issues"
+  },
   "author": "",
   "license": "MIT",
   "type": "module",
@@ -26,7 +35,8 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   },
   "bin": {
     "stitch-mcp": "dist/index.js"

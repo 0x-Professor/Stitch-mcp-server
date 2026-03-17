@@ -57,5 +57,15 @@ Built natively with:
 - Zod for rigorous run-time schema validation
 - `tsup` for rapid transparent builds
 
+## Publishing to NPM
+
+This project is fully weaponized for NPM publishing.
+
+1. Ensure you are logged into NPM: `npm login`
+2. Test the build: `npm run build`
+3. Publish publicly: `npm publish --access public`
+
+The `package.json` uses the `files` directive to only pack the optimized `dist` folder, keeping the package extremely lightweight.
+
 ## License
 MIT
