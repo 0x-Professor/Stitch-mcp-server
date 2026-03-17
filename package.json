@@ -28,6 +28,7 @@
   "type": "module",
   "dependencies": {
     "@google/stitch-sdk": "^0.0.3",
+    "@inquirer/prompts": "^8.3.2",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "dotenv": "^17.3.1",
     "zod": "^4.3.6"
@@ -39,6 +40,7 @@
     "vitest": "^4.1.0"
   },
   "bin": {
-    "stitch-mcp": "dist/index.js"
+    "stitch-mcp": "dist/index.js",
+    "stitch-mcp-setup": "dist/cli.js"
   }
 }
