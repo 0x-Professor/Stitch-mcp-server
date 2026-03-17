@@ -32,11 +32,8 @@ const getClineConfigPath = () => {
   return path.join(getAppDataPath(), "Code", "User", "globalStorage", "saoudrizwan.claude-dev", "settings", "cline_mcp_settings.json");
 };
 
-const getCursorConfigDir = () => {
-  // Cursor usually configures MCP via the UI which stores in its SQLite DB or in workspace .cursor/mcp.json. 
-  // However, we can create a `.cursor/mcp.json` in the user's home directory if they want a start. 
-  // Or we can just prompt them to set it up in the UI.
-  return path.join(homedir, ".cursor");
+const getCursorConfigPath = () => {
+  return path.join(process.cwd(), ".cursor", "mcp.json");
 };
 
 export const runSetup = async () => {
@@ -57,7 +54,7 @@ export const runSetup = async () => {
     {
       name: "Cursor (Workspace Config)",
       value: "cursor",
-      checked: fs.existsSync(getCursorConfigDir()),
+      checked: fs.existsSync(getCursorConfigPath()),
     }
   ];
 
@@ -118,8 +115,7 @@ export const runSetup = async () => {
     } else if (tool === "cline") {
       updateJsonConfig(getClineConfigPath());
     } else if (tool === "cursor") {
-      // Create a global or workspace .cursor/mcp.json snippet
-      const cursorPath = path.join(process.cwd(), ".cursor", "mcp.json");
+      const cursorPath = getCursorConfigPath();
       console.log(`\n💡 Note: Cursor handles MCP per-workspace or via its UI Settings.`);
       console.log(`Generating workspace config for Cursor at ${cursorPath}`);
       updateJsonConfig(cursorPath);

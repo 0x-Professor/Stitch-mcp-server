@@ -15,17 +15,32 @@ This server acts as a bridge between your coding agent (Claude, Gemini, Copilot,
 - **Context Resources**: Map abstract IDs natively with `stitch://projects` and `stitch://projects/{projectId}/screens` context providers.
 - **Bootstrapping Prompts**: Leverage the native `create_web_app` prompt for zero-shot orchestration to guide agents from project creation to scaffolding.
 
-## Setup
+## Installation & Setup
 
-You need an active `STITCH_API_KEY` to run this server. 
+You need an active `STITCH_API_KEY` to run this server. You can sign up with your Google account to get one.
 
-### Global Execution (npx)
+This package comes with a built-in automated installer for **Claude Desktop**, **Cline**, and **Cursor**.
+
+### The Easy Way (Interactive Setup)
+
+Run the following command anywhere on your machine. It will ask which AI tools you want to configure, and it will safely insert the server and prompt you for your `STITCH_API_KEY`:
+
+```bash
+npx -y stitch-mcp-server@latest setup
+```
+
+That's it! Restart your target application and the tools will appear.
+
+### The Manual Way (JSON Config)
+
+If you prefer to configure your client manually, use the following snippet. Ensure you replace `your-api-key` with your actual Stitch API Key.
+
 ```json
 {
   "mcpServers": {
-    "stitch-mcp": {
+    "stitch": {
       "command": "npx",
-      "args": ["stitch-mcp-server"],
+      "args": ["-y", "stitch-mcp-server@latest"],
       "env": {
         "STITCH_API_KEY": "your-api-key"
       }
@@ -33,6 +48,12 @@ You need an active `STITCH_API_KEY` to run this server.
   }
 }
 ```
+
+---
+
+## Capabilities
+
+The `stitch-mcp-server` gives your AI assistant several specialized tools:
 
 ### Local Development
 1. Install dependencies:
