@@ -1,16 +1,21 @@
 {
   "name": "stitch-mcp-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Enterprise-ready MCP Server for Google Stitch UI generation SDK",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsup",
     "start": "node dist/index.js"
   },
-  "keywords": [],
+  "keywords": [
+    "mcp",
+    "stitch",
+    "ai",
+    "google-stitch"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "@google/stitch-sdk": "^0.0.3",
