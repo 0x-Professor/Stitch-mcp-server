@@ -36,51 +36,105 @@ const getCursorConfigPath = () => {
   return path.join(process.cwd(), ".cursor", "mcp.json");
 };
 
+// Helper to safely parse JSON with error recovery
+const safeParseJSON = (content: string, configPath: string): { mcpServers: Record<string, unknown> } | null => {
+  try {
+    const parsed = JSON.parse(content);
+    return parsed;
+  } catch (err) {
+    console.warn(`⚠️  Warning: ${configPath} contains invalid JSON and will be reset.`);
+    return null;
+  }
+};
+
+// Helper to create backup of existing config
+const backupConfig = (configPath: string): string | null => {
+  try {
+    if (fs.existsSync(configPath)) {
+      const backupPath = `${configPath}.backup.${Date.now()}`;
+      fs.copyFileSync(configPath, backupPath);
+      return backupPath;
+    }
+  } catch {
+    // Ignore backup failures
+  }
+  return null;
+};
+
 export const runSetup = async () => {
   console.log("\n🚀 Welcome to the Stitch MCP Server Setup!");
   console.log("This utility will automatically configure your favorite tools to use the Stitch MCP Server.\n");
 
+  // Detect which tools are installed/available
+  const claudeInstalled = fs.existsSync(path.dirname(getClaudeDesktopConfigPath()));
+  const clineInstalled = fs.existsSync(path.dirname(getClineConfigPath()));
+  
   const tools = [
     {
-      name: "Claude Desktop",
+      name: `Claude Desktop${claudeInstalled ? "" : " (not detected)"}`,
       value: "claude",
-      checked: fs.existsSync(getClaudeDesktopConfigPath()),
+      checked: claudeInstalled,
     },
     {
-      name: "Cline (VS Code Extension)",
+      name: `Cline (VS Code Extension)${clineInstalled ? "" : " (not detected)"}`,
       value: "cline",
-      checked: fs.existsSync(getClineConfigPath()),
+      checked: clineInstalled,
     },
     {
       name: "Cursor (Workspace Config)",
       value: "cursor",
-      checked: fs.existsSync(getCursorConfigPath()),
+      checked: false,
     }
   ];
 
-  const selectedTools = await checkbox({
-    message: "Which tools would you like to configure this MCP Server for?",
-    choices: tools,
-  });
+  let selectedTools: string[];
+  try {
+    selectedTools = await checkbox({
+      message: "Which tools would you like to configure this MCP Server for?",
+      choices: tools,
+    });
+  } catch (err: unknown) {
+    // Handle user cancellation (Ctrl+C)
+    if (err && typeof err === 'object' && 'name' in err && err.name === 'ExitPromptError') {
+      console.log("\n👋 Setup cancelled by user.");
+      return;
+    }
+    throw err;
+  }
 
   if (selectedTools.length === 0) {
     console.log("❌ No tools selected. Exiting.");
     return;
   }
 
-  const apiKey = await input({
-    message: "Please enter your Stitch API Key (STITCH_API_KEY):",
-  });
-
-  if (!apiKey) {
-    console.log("❌ API Key is required. Exiting.");
-    return;
+  let apiKey: string;
+  try {
+    apiKey = await input({
+      message: "Please enter your Stitch API Key (STITCH_API_KEY):",
+      validate: (value) => {
+        if (!value || value.trim().length === 0) {
+          return "API Key is required. Get one at https://stitch.google.com";
+        }
+        if (value.trim().length < 10) {
+          return "API Key seems too short. Please check and try again.";
+        }
+        return true;
+      },
+    });
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'name' in err && err.name === 'ExitPromptError') {
+      console.log("\n👋 Setup cancelled by user.");
+      return;
+    }
+    throw err;
   }
+
+  apiKey = apiKey.trim();
 
   console.log("\nConfiguring selected tools...\n");
 
   const serverCommand = platform === "win32" ? "npx.cmd" : "npx";
-  const serverArgs = ["-y", "stitch-mcp-server"];
+  const serverArgs = ["-y", "stitch-mcp-server@latest"];
 
   const mcpConfigEntry = {
     command: serverCommand,
@@ -90,40 +144,88 @@ export const runSetup = async () => {
     }
   };
 
-  const updateJsonConfig = (configPath: string, keyName: string = "stitch", serverDef = mcpConfigEntry) => {
-    let config: any = { mcpServers: {} };
+  const updateJsonConfig = (configPath: string, keyName: string = "stitch", serverDef = mcpConfigEntry): boolean => {
+    let config: { mcpServers: Record<string, unknown> } = { mcpServers: {} };
+    
     try {
+      // Create directory if it doesn't exist
+      const configDir = path.dirname(configPath);
+      if (!fs.existsSync(configDir)) {
+        fs.mkdirSync(configDir, { recursive: true });
+        console.log(`📁 Created directory: ${configDir}`);
+      }
+
+      // Read existing config if it exists
       if (fs.existsSync(configPath)) {
         const fileContent = fs.readFileSync(configPath, "utf-8");
-        config = JSON.parse(fileContent);
-        if (!config.mcpServers) config.mcpServers = {};
-      } else {
-        fs.mkdirSync(path.dirname(configPath), { recursive: true });
+        const parsed = safeParseJSON(fileContent, configPath);
+        
+        if (parsed === null) {
+          // Invalid JSON - backup and start fresh
+          const backupPath = backupConfig(configPath);
+          if (backupPath) {
+            console.log(`📦 Backed up corrupted config to: ${backupPath}`);
+          }
+          config = { mcpServers: {} };
+        } else {
+          config = parsed;
+          if (!config.mcpServers || typeof config.mcpServers !== 'object') {
+            config.mcpServers = {};
+          }
+        }
       }
       
+      // Add/update the stitch server config
       config.mcpServers[keyName] = serverDef;
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+      
+      // Write config with proper formatting
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", { mode: 0o600 });
       console.log(`✅ Successfully updated: ${configPath}`);
-    } catch (err) {
-      console.error(`❌ Failed to update ${configPath}:`, err);
+      return true;
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error(`❌ Failed to update ${configPath}: ${errorMessage}`);
+      return false;
     }
   };
 
+  let successCount = 0;
+  let failCount = 0;
+
   for (const tool of selectedTools) {
     if (tool === "claude") {
-      updateJsonConfig(getClaudeDesktopConfigPath());
+      const success = updateJsonConfig(getClaudeDesktopConfigPath());
+      success ? successCount++ : failCount++;
     } else if (tool === "cline") {
-      updateJsonConfig(getClineConfigPath());
+      const success = updateJsonConfig(getClineConfigPath());
+      success ? successCount++ : failCount++;
     } else if (tool === "cursor") {
       const cursorPath = getCursorConfigPath();
       console.log(`\n💡 Note: Cursor handles MCP per-workspace or via its UI Settings.`);
-      console.log(`Generating workspace config for Cursor at ${cursorPath}`);
-      updateJsonConfig(cursorPath);
-      console.log(`👉 In Cursor: Go to Cursor Settings Menu > Settings > Features > MCP to manage servers visually.`);
+      console.log(`📝 Generating workspace config for Cursor at ${cursorPath}`);
+      const success = updateJsonConfig(cursorPath);
+      success ? successCount++ : failCount++;
+      if (success) {
+        console.log(`👉 In Cursor: Go to Cursor Settings Menu > Settings > Features > MCP to manage servers visually.`);
+      }
     }
   }
 
-  console.log("\n🎉 Setup complete! You can now use Stitch-mcp-server in your selected tools.");
-  console.log("Make sure to restart Claude Desktop or reload your Editor for changes to take effect.");
+  console.log("\n" + "─".repeat(60));
+  
+  if (failCount === 0) {
+    console.log("🎉 Setup complete! All configurations updated successfully.");
+  } else if (successCount > 0) {
+    console.log(`⚠️  Setup partially complete. ${successCount} succeeded, ${failCount} failed.`);
+  } else {
+    console.log("❌ Setup failed. Please check the errors above and try again.");
+    process.exitCode = 1;
+    return;
+  }
+  
+  console.log("\n📋 Next steps:");
+  console.log("   1. Restart Claude Desktop or reload your Editor");
+  console.log("   2. Look for 'stitch' in your MCP tools list");
+  console.log("   3. Try asking your AI assistant to 'create a Stitch project'");
+  console.log("\n💡 Documentation: https://github.com/0x-Professor/Stitch-mcp-server");
 };
-

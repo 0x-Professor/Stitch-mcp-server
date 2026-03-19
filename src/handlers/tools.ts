@@ -35,7 +35,7 @@ export function registerTools(server: McpServer) {
     async () => {
       try {
         const projects = await stitch.projects();
-        const projectList = projects.map(p => `- ${p.id}`).join('\\n');
+        const projectList = projects.map(p => `- ${p.id}`).join('\n');
         return {
           content: [{ type: "text", text: `Projects:\n${projectList}` }],
         };
@@ -114,7 +114,7 @@ export function registerTools(server: McpServer) {
         const screen = await project.getScreen(screenId);
         
         const variants = await screen.variants(prompt, { variantCount, creativeRange, aspects });
-        const variantList = variants.map((v, i) => `Variant ${i + 1} ID: ${v.id}`).join('\\n');
+        const variantList = variants.map((v, i) => `Variant ${i + 1} ID: ${v.id}`).join('\n');
 
         return {
           content: [{ type: "text", text: `Variants generated successfully:\n${variantList}` }],
@@ -198,6 +198,9 @@ export function registerTools(server: McpServer) {
         const htmlUrl = await screen.getHtml();
         
         const response = await fetch(htmlUrl);
+        if (!response.ok) {
+          return { content: [{ type: "text", text: `Failed to fetch HTML content (HTTP ${response.status}): ${htmlUrl}` }], isError: true };
+        }
         const htmlContent = await response.text();
 
         return {
@@ -222,15 +225,38 @@ export function registerTools(server: McpServer) {
     },
     async ({ projectId, screenId, filePath }) => {
       try {
+        // Security: Validate file path to prevent path traversal attacks
+        const baseDir = process.cwd();
+        const resolvedPath = path.resolve(baseDir, filePath);
+        
+        // Ensure the resolved path is within the current working directory
+        if (!resolvedPath.startsWith(baseDir + path.sep) && resolvedPath !== baseDir) {
+          return { 
+            content: [{ type: "text", text: `Error: Path traversal detected. File path must be within the current workspace directory.` }], 
+            isError: true 
+          };
+        }
+
+        // Validate file path doesn't contain dangerous patterns
+        const normalizedPath = path.normalize(filePath);
+        if (normalizedPath.startsWith('..') || path.isAbsolute(filePath)) {
+          return { 
+            content: [{ type: "text", text: `Error: Invalid file path. Use relative paths within the workspace (e.g., 'src/components/MyComponent.html').` }], 
+            isError: true 
+          };
+        }
+
         const project = stitch.project(projectId);
         const screen = await project.getScreen(screenId);
         const htmlUrl = await screen.getHtml();
         
         const response = await fetch(htmlUrl);
+        if (!response.ok) {
+          return { content: [{ type: "text", text: `Failed to fetch HTML content (HTTP ${response.status}): ${htmlUrl}` }], isError: true };
+        }
         const htmlContent = await response.text();
 
         // Save to file system
-        const resolvedPath = path.resolve(process.cwd(), filePath);
         await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
         await fs.writeFile(resolvedPath, htmlContent, 'utf-8');
 
