@@ -1,4 +1,4 @@
-# 🧵 Stitch MCP Server
+# Stitch MCP Server
 
 [![npm version](https://img.shields.io/npm/v/stitch-mcp-server.svg)](https://www.npmjs.com/package/stitch-mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/stitch-mcp-server.svg)](https://www.npmjs.com/package/stitch-mcp-server)
@@ -12,20 +12,20 @@ The **Stitch MCP Server** bridges your AI coding assistant (Claude, Cursor, Clin
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---------|-------------|
-| 🎨 **AI UI Generation** | Generate complete HTML screens from text descriptions |
-| 🔄 **Edit & Iterate** | Modify existing screens with natural language prompts |
-| 📐 **Design Variants** | Generate multiple design variations to explore options |
-| 💾 **Auto-Scaffold** | Save generated UI directly to your project files |
-| 🔌 **Multi-Client** | Works with Claude Desktop, Cursor, Cline (VS Code), and any MCP client |
-| ⚡ **One-Click Setup** | Interactive installer configures everything automatically |
+| **AI UI Generation** | Generate complete HTML screens from text descriptions |
+| **Edit and Iterate** | Modify existing screens with natural language prompts |
+| **Design Variants** | Generate multiple design variations to explore options |
+| **Auto-Scaffold** | Save generated UI directly to your project files |
+| **Multi-Client Support** | Works with Claude Desktop, Cursor, Cline (VS Code), and any MCP client |
+| **One-Click Setup** | Interactive installer configures everything automatically |
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -41,10 +41,10 @@ npx stitch-mcp-server setup
 ```
 
 This will:
-1. ✅ Ask which AI tools you want to configure (Claude, Cursor, Cline)
-2. ✅ Prompt for your Stitch API key
-3. ✅ Automatically update your MCP configuration files
-4. ✅ Done! Restart your AI tool and start generating UIs
+1. Ask which AI tools you want to configure (Claude, Cursor, Cline)
+2. Prompt for your Stitch API key
+3. Automatically update your MCP configuration files
+4. Done - restart your AI tool and start generating UIs
 
 ### Manual Configuration
 
@@ -106,7 +106,7 @@ If you prefer manual setup, add this to your MCP config file:
 
 ---
 
-## 🛠️ Available Tools
+## Available Tools
 
 ### Core Tools
 
@@ -138,7 +138,7 @@ If you prefer manual setup, add this to your MCP config file:
 
 ---
 
-## 💡 Usage Examples
+## Usage Examples
 
 ### Generate a Landing Page
 
@@ -171,7 +171,7 @@ Take the login screen and:
 
 ---
 
-## 🏗️ Local Development
+## Local Development
 
 ```bash
 # Clone the repo
@@ -196,7 +196,7 @@ STITCH_API_KEY=your-key npm test
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 - **Runtime**: Node.js 18+
 - **Language**: TypeScript
@@ -208,18 +208,18 @@ STITCH_API_KEY=your-key npm test
 
 ---
 
-## 🔒 Security
+## Security
 
 This server implements several security measures:
 
-- ✅ **Path Traversal Protection** — Prevents writing files outside your workspace
-- ✅ **Input Validation** — All inputs validated with Zod schemas
-- ✅ **Secure Config Storage** — API keys stored with restricted file permissions (0600)
-- ✅ **HTTP Response Validation** — Proper error handling for all network requests
+- **Path Traversal Protection** — Prevents writing files outside your workspace
+- **Input Validation** — All inputs validated with Zod schemas
+- **Secure Config Storage** — API keys stored with restricted file permissions (0600)
+- **HTTP Response Validation** — Proper error handling for all network requests
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -231,13 +231,13 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 ---
 
-## 📄 License
+## License
 
-MIT © [0x-Professor](https://github.com/0x-Professor)
+MIT - [0x-Professor](https://github.com/0x-Professor)
 
 ---
 
-## 🔗 Links
+## Links
 
 - **npm**: [npmjs.com/package/stitch-mcp-server](https://www.npmjs.com/package/stitch-mcp-server)
 - **GitHub**: [github.com/0x-Professor/Stitch-mcp-server](https://github.com/0x-Professor/Stitch-mcp-server)
@@ -248,5 +248,5 @@ MIT © [0x-Professor](https://github.com/0x-Professor)
 ---
 
 <p align="center">
-  <sub>Built with ❤️ for the AI-assisted development community</sub>
+  <sub>Built for the AI-assisted development community</sub>
 </p>

@@ -42,7 +42,7 @@ const safeParseJSON = (content: string, configPath: string): { mcpServers: Recor
     const parsed = JSON.parse(content);
     return parsed;
   } catch (err) {
-    console.warn(`⚠️  Warning: ${configPath} contains invalid JSON and will be reset.`);
+    console.warn(`Warning: ${configPath} contains invalid JSON and will be reset.`);
     return null;
   }
 };
@@ -62,7 +62,7 @@ const backupConfig = (configPath: string): string | null => {
 };
 
 export const runSetup = async () => {
-  console.log("\n🚀 Welcome to the Stitch MCP Server Setup!");
+  console.log("\nWelcome to the Stitch MCP Server Setup");
   console.log("This utility will automatically configure your favorite tools to use the Stitch MCP Server.\n");
 
   // Detect which tools are installed/available
@@ -96,14 +96,14 @@ export const runSetup = async () => {
   } catch (err: unknown) {
     // Handle user cancellation (Ctrl+C)
     if (err && typeof err === 'object' && 'name' in err && err.name === 'ExitPromptError') {
-      console.log("\n👋 Setup cancelled by user.");
+      console.log("\nSetup cancelled by user.");
       return;
     }
     throw err;
   }
 
   if (selectedTools.length === 0) {
-    console.log("❌ No tools selected. Exiting.");
+    console.log("No tools selected. Exiting.");
     return;
   }
 
@@ -123,7 +123,7 @@ export const runSetup = async () => {
     });
   } catch (err: unknown) {
     if (err && typeof err === 'object' && 'name' in err && err.name === 'ExitPromptError') {
-      console.log("\n👋 Setup cancelled by user.");
+      console.log("\nSetup cancelled by user.");
       return;
     }
     throw err;
@@ -152,7 +152,7 @@ export const runSetup = async () => {
       const configDir = path.dirname(configPath);
       if (!fs.existsSync(configDir)) {
         fs.mkdirSync(configDir, { recursive: true });
-        console.log(`📁 Created directory: ${configDir}`);
+        console.log(`Created directory: ${configDir}`);
       }
 
       // Read existing config if it exists
@@ -164,7 +164,7 @@ export const runSetup = async () => {
           // Invalid JSON - backup and start fresh
           const backupPath = backupConfig(configPath);
           if (backupPath) {
-            console.log(`📦 Backed up corrupted config to: ${backupPath}`);
+            console.log(`Backed up corrupted config to: ${backupPath}`);
           }
           config = { mcpServers: {} };
         } else {
@@ -180,11 +180,11 @@ export const runSetup = async () => {
       
       // Write config with proper formatting
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", { mode: 0o600 });
-      console.log(`✅ Successfully updated: ${configPath}`);
+      console.log(`Successfully updated: ${configPath}`);
       return true;
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error(`❌ Failed to update ${configPath}: ${errorMessage}`);
+      console.error(`Failed to update ${configPath}: ${errorMessage}`);
       return false;
     }
   };
@@ -201,31 +201,31 @@ export const runSetup = async () => {
       success ? successCount++ : failCount++;
     } else if (tool === "cursor") {
       const cursorPath = getCursorConfigPath();
-      console.log(`\n💡 Note: Cursor handles MCP per-workspace or via its UI Settings.`);
-      console.log(`📝 Generating workspace config for Cursor at ${cursorPath}`);
+      console.log(`\nNote: Cursor handles MCP per-workspace or via its UI Settings.`);
+      console.log(`Generating workspace config for Cursor at ${cursorPath}`);
       const success = updateJsonConfig(cursorPath);
       success ? successCount++ : failCount++;
       if (success) {
-        console.log(`👉 In Cursor: Go to Cursor Settings Menu > Settings > Features > MCP to manage servers visually.`);
+        console.log(`In Cursor: Go to Cursor Settings Menu > Settings > Features > MCP to manage servers visually.`);
       }
     }
   }
 
-  console.log("\n" + "─".repeat(60));
+  console.log("\n" + "-".repeat(60));
   
   if (failCount === 0) {
-    console.log("🎉 Setup complete! All configurations updated successfully.");
+    console.log("Setup complete. All configurations updated successfully.");
   } else if (successCount > 0) {
-    console.log(`⚠️  Setup partially complete. ${successCount} succeeded, ${failCount} failed.`);
+    console.log(`Setup partially complete. ${successCount} succeeded, ${failCount} failed.`);
   } else {
-    console.log("❌ Setup failed. Please check the errors above and try again.");
+    console.log("Setup failed. Please check the errors above and try again.");
     process.exitCode = 1;
     return;
   }
   
-  console.log("\n📋 Next steps:");
+  console.log("\nNext steps:");
   console.log("   1. Restart Claude Desktop or reload your Editor");
   console.log("   2. Look for 'stitch' in your MCP tools list");
   console.log("   3. Try asking your AI assistant to 'create a Stitch project'");
-  console.log("\n💡 Documentation: https://github.com/0x-Professor/Stitch-mcp-server");
+  console.log("\nDocumentation: https://github.com/0x-Professor/Stitch-mcp-server");
 };
