@@ -1,8 +1,9 @@
 {
   "name": "stitch-mcp-server",
-  "version": "1.0.1",
-  "description": "Enterprise-ready MCP Server for Google Stitch UI generation SDK",
+  "version": "1.0.2",
+  "description": "Enterprise-ready MCP Server for Google Stitch SDK - AI-powered UI generation for Claude, Cursor, Cline, and VS Code. Generate beautiful web interfaces from text prompts using Model Context Protocol.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/vitest/vitest.mjs run",
     "build": "tsup",
@@ -14,9 +15,28 @@
     "mcp",
     "model-context-protocol",
     "stitch",
+    "google-stitch",
     "ai",
-    "google-stitch"
+    "ui-generation",
+    "claude",
+    "cursor",
+    "cline",
+    "vscode",
+    "anthropic",
+    "gemini",
+    "copilot",
+    "ai-tools",
+    "code-generation",
+    "html-generation",
+    "web-components",
+    "design-system",
+    "prototyping",
+    "mcp-server",
+    "llm",
+    "ai-assistant",
+    "developer-tools"
   ],
+  "homepage": "https://github.com/0x-Professor/Stitch-mcp-server#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/0x-Professor/Stitch-mcp-server.git"
@@ -24,9 +44,17 @@
   "bugs": {
     "url": "https://github.com/0x-Professor/Stitch-mcp-server/issues"
   },
-  "author": "",
+  "author": "0x-Professor",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@google/stitch-sdk": "^0.0.3",
     "@inquirer/prompts": "^8.3.2",

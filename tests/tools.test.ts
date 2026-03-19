@@ -88,7 +88,7 @@ describe('Stitch MCP Server Integration Tests', () => {
       const result = await client.request(
         { method: "tools/call", params: { name: 'generate_and_fetch_code', arguments: { projectId: projectId, prompt: "A simple red button centered on the screen", deviceType: "DESKTOP" } } },
         CallToolResultSchema,
-        { timeout: 120000 }
+        { timeout: 180000 }
       );
 
       expect(result.isError).toBeFalsy();
@@ -103,7 +103,7 @@ describe('Stitch MCP Server Integration Tests', () => {
       expect(text1).toContain('```html');
       expect(text1).toContain('</html>');
     }
-  }, 120000); 
+  }, 180000); 
 
   it('should scaffold project files successfully', async () => {
     const listResult = await client.callTool({
