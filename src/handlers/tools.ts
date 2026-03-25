@@ -19,8 +19,14 @@ export function registerTools(server: McpServer) {
     async ({ title }) => {
       try {
         const result = await toolClient.callTool("create_project", { title });
+        
+        let outputText = JSON.stringify(result, null, 2);
+        if (outputText.length > 3000) {
+          outputText = outputText.substring(0, 3000) + "\n...[Content truncated to prevent context overflow]...";
+        }
+
         return {
-          content: [{ type: "text", text: `Project created successfully!\n\n${JSON.stringify(result, null, 2)}` }],
+          content: [{ type: "text", text: `Project created successfully!\n\n${outputText}` }],
         };
       } catch (error: any) {
         return { content: [{ type: "text", text: `Error creating project: ${error?.message || String(error)}` }], isError: true };
