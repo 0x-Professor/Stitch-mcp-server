@@ -1,6 +1,6 @@
 {
   "name": "stitch-mcp-server",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Enterprise-ready MCP Server for Google Stitch SDK - AI-powered UI generation for Claude, Cursor, Cline, and VS Code. Generate beautiful web interfaces from text prompts using Model Context Protocol.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
