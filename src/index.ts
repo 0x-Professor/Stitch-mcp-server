@@ -2,13 +2,9 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import dotenv from "dotenv";
 import { registerTools } from "./handlers/tools.js";
 import { registerResources } from "./handlers/resources.js";
 import { registerPrompts } from "./handlers/prompts.js";
-
-// Load environment variables
-dotenv.config();
 
 // Check for setup subcommand
 const args = process.argv.slice(2);
