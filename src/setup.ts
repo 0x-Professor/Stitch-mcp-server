@@ -65,46 +65,18 @@ export const runSetup = async () => {
   console.log("\nWelcome to the Stitch MCP Server Setup");
   console.log("This utility will automatically configure your favorite tools to use the Stitch MCP Server.\n");
 
-  // Detect which tools are installed/available
   const claudeInstalled = fs.existsSync(path.dirname(getClaudeDesktopConfigPath()));
   const clineInstalled = fs.existsSync(path.dirname(getClineConfigPath()));
-  
-  const tools = [
-    {
-      name: `Claude Desktop${claudeInstalled ? "" : " (not detected)"}`,
-      value: "claude",
-      checked: claudeInstalled,
-    },
-    {
-      name: `Cline (VS Code Extension)${clineInstalled ? "" : " (not detected)"}`,
-      value: "cline",
-      checked: clineInstalled,
-    },
-    {
-      name: "Cursor (Workspace Config)",
-      value: "cursor",
-      checked: false,
-    }
-  ];
+  const cursorInstalled = fs.existsSync(path.join(process.cwd(), ".cursor"));
 
-  let selectedTools: string[];
-  try {
-    selectedTools = await checkbox({
-      message: "Which tools would you like to configure this MCP Server for?",
-      choices: tools,
-    });
-  } catch (err: unknown) {
-    // Handle user cancellation (Ctrl+C)
-    if (err && typeof err === 'object' && 'name' in err && err.name === 'ExitPromptError') {
-      console.log("\nSetup cancelled by user.");
-      return;
-    }
-    throw err;
-  }
+  const availableTools: string[] = [];
+  if (claudeInstalled) availableTools.push("Claude Desktop");
+  if (clineInstalled) availableTools.push("Cline AI");
+  if (cursorInstalled) availableTools.push("Cursor");
 
-  if (selectedTools.length === 0) {
-    console.log("No tools selected. Exiting.");
-    return;
+  if (availableTools.length === 0) {
+    console.log("No automatically configurable AI apps detected on this system.");
+    console.log("We will provide you with the JSON configuration you can manually paste into your MCP settings.\n");
   }
 
   let apiKey: string;
@@ -131,8 +103,6 @@ export const runSetup = async () => {
 
   apiKey = apiKey.trim();
 
-  console.log("\nConfiguring selected tools...\n");
-
   const serverCommand = platform === "win32" ? "npx.cmd" : "npx";
   const serverArgs = ["-y", "stitch-mcp-server@latest"];
 
@@ -143,6 +113,63 @@ export const runSetup = async () => {
       STITCH_API_KEY: apiKey
     }
   };
+
+  if (availableTools.length === 0) {
+    console.log("\n================ MCP CONFIGURATION ================\n");
+    console.log(JSON.stringify({
+      mcpServers: {
+        "stitch": mcpConfigEntry
+      }
+    }, null, 2));
+    console.log("\n===================================================\n");
+    console.log("Please copy the JSON above and paste it into your app's MCP settings.");
+    return;
+  }
+
+  const tools = [
+    {
+      name: `Claude Desktop${claudeInstalled ? "" : " (not detected)"}`,
+      value: "claude",
+      checked: claudeInstalled,
+    },
+    {
+      name: `Cline (VS Code Extension)${clineInstalled ? "" : " (not detected)"}`,
+      value: "cline",
+      checked: clineInstalled,
+    },
+    {
+      name: "Cursor (Workspace Config)",
+      value: "cursor",
+      checked: cursorInstalled,
+    }
+  ];
+
+  let selectedTools: string[];
+  try {
+    selectedTools = await checkbox({
+      message: "Which tools would you like to configure this MCP Server for?",
+      choices: tools,
+    });
+  } catch (err: unknown) {
+    // Handle user cancellation (Ctrl+C)
+    if (err && typeof err === 'object' && 'name' in err && err.name === 'ExitPromptError') {
+      console.log("\nSetup cancelled by user.");
+      return;
+    }
+    throw err;
+  }
+
+  if (selectedTools.length === 0) {
+    console.log("\nNo tools selected. Here is your raw configuration:\n");
+    console.log(JSON.stringify({
+      mcpServers: {
+        "stitch": mcpConfigEntry
+      }
+    }, null, 2));
+    return;
+  }
+
+  console.log("\nConfiguring selected tools...\n");
 
   const updateJsonConfig = (configPath: string, keyName: string = "stitch", serverDef = mcpConfigEntry): boolean => {
     let config: { mcpServers: Record<string, unknown> } = { mcpServers: {} };
